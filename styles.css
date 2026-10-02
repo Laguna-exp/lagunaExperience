@@ -1,0 +1,1822 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+:root {
+
+    --ink: #174a36;
+    --ink-deep: #0d3829;
+
+    --water: #36a66f;
+    --water-dark: #247d52;
+
+    --turquoise: #82d8a7;
+
+    --sand: #edf3e8;
+    --cream: #f8faf5;
+
+    --white: #ffffff;
+
+    --line: rgba(23, 74, 54, .12);
+
+    --shadow:
+        0 24px 70px rgba(13, 56, 41, .12);
+
+    --font-body: "DM Sans", sans-serif;
+    --font-display: "Manrope", sans-serif;
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+
+
+html {
+
+    scroll-behavior: smooth;
+
+}
+
+
+body {
+
+    min-height: 100vh;
+
+    background:
+        linear-gradient(
+            180deg,
+            #f8faf5 0%,
+            #edf3e8 100%
+        );
+
+    color: var(--ink);
+
+    font-family: var(--font-body);
+
+    overflow-x: hidden;
+
+}
+
+
+a {
+
+    color: inherit;
+    text-decoration: none;
+
+}
+
+
+button {
+
+    font-family: inherit;
+
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.main-navbar {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+
+    z-index: 1000;
+
+    background:
+        rgba(248, 250, 245, .86);
+
+    backdrop-filter:
+        blur(16px);
+
+    -webkit-backdrop-filter:
+        blur(16px);
+
+    border-bottom:
+        1px solid
+        rgba(23, 74, 54, .10);
+
+    transition:
+        background .25s ease,
+        box-shadow .25s ease;
+
+}
+
+
+.main-navbar.scrolled {
+
+    background:
+        rgba(248, 250, 245, .97);
+
+    box-shadow:
+        0 8px 30px
+        rgba(13, 56, 41, .12);
+
+}
+
+
+.nav-container {
+
+    width: 100%;
+
+    max-width: 1380px;
+
+    min-height: 72px;
+
+    margin: 0 auto;
+
+    padding:
+        0 5%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+}
+
+
+.nav-logo {
+
+    color: var(--ink);
+
+    font-family: var(--font-display);
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+    letter-spacing: -.04em;
+
+    white-space: nowrap;
+
+    transition:
+        color .2s ease;
+
+}
+
+
+.nav-logo span {
+
+    color: var(--water);
+
+}
+
+
+.nav-logo:hover {
+
+    color: var(--water-dark);
+
+}
+
+
+.nav-links {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 5px;
+
+}
+
+
+.nav-links a {
+
+    position: relative;
+
+    padding:
+        10px 15px;
+
+    border-radius: 12px;
+
+    color: var(--ink);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
+
+}
+
+
+.nav-links a:hover {
+
+    background:
+        rgba(54, 166, 111, .10);
+
+    color: var(--water-dark);
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+/* =========================================================
+   ESPACIO PARA EL NAVBAR
+========================================================= */
+
+body {
+
+    padding-top: 72px;
+
+}
+
+
+#inicio,
+#sobre-laguna,
+#experiencias,
+#mapa {
+
+    scroll-margin-top: 90px;
+
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+
+    position: relative;
+
+    min-height: 720px;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 80px 8%;
+
+    overflow: hidden;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            rgba(13, 56, 41, .94),
+            rgba(13, 56, 41, .58),
+            rgba(13, 56, 41, .15)
+        ),
+
+        url("https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=2000&q=90")
+
+        center / cover no-repeat;
+
+}
+
+
+.hero::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+
+        linear-gradient(
+            180deg,
+            transparent 65%,
+            rgba(13, 56, 41, .35)
+        );
+
+}
+
+
+.hero-content {
+
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 700px;
+
+    color: white;
+
+}
+
+
+.hero-kicker {
+
+    margin-bottom: 18px;
+
+    color: var(--turquoise);
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: .2em;
+
+}
+
+
+.hero h1 {
+
+    margin-bottom: 22px;
+
+    font-family: var(--font-display);
+
+    font-size:
+        clamp(60px, 9vw, 115px);
+
+    font-weight: 800;
+
+    line-height: .9;
+
+    letter-spacing: -.07em;
+
+}
+
+
+.hero h1 span {
+
+    display: block;
+
+    color: var(--turquoise);
+
+}
+
+
+.hero p {
+
+    max-width: 580px;
+
+    margin-bottom: 32px;
+
+    color:
+        rgba(255, 255, 255, .78);
+
+    font-size: 17px;
+
+    line-height: 1.7;
+
+}
+
+
+.hero-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 48px;
+
+    padding:
+        0 22px;
+
+    border-radius: 14px;
+
+    background: white;
+
+    color: var(--ink);
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    box-shadow:
+        0 15px 35px
+        rgba(0, 0, 0, .18);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+
+}
+
+
+.hero-button:hover {
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 20px 45px
+        rgba(0, 0, 0, .25);
+
+}
+
+
+/* =========================================================
+   INTRO
+========================================================= */
+
+.intro-section {
+
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    padding:
+        120px 24px 80px;
+
+    text-align: center;
+
+}
+
+
+.section-kicker {
+
+    margin-bottom: 12px;
+
+    color: var(--water-dark);
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: .18em;
+
+    text-transform: uppercase;
+
+}
+
+
+.intro-section h2,
+.section-heading h2,
+.map-section h2 {
+
+    color: var(--ink-deep);
+
+    font-family: var(--font-display);
+
+    font-size:
+        clamp(36px, 5vw, 62px);
+
+    font-weight: 800;
+
+    line-height: 1;
+
+    letter-spacing: -.055em;
+
+}
+
+
+.intro-section p {
+
+    max-width: 680px;
+
+    margin:
+        24px auto 0;
+
+    color:
+        rgba(23, 74, 54, .68);
+
+    font-size: 16px;
+
+    line-height: 1.75;
+
+}
+
+
+/* =========================================================
+   EXPERIENCES
+========================================================= */
+
+.experiences-section {
+
+    max-width: 1380px;
+
+    margin: 0 auto;
+
+    padding:
+        70px 5% 120px;
+
+}
+
+
+.section-heading {
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 40px;
+
+    margin-bottom: 42px;
+
+}
+
+
+.section-heading > p {
+
+    max-width: 360px;
+
+    color:
+        rgba(23, 74, 54, .62);
+
+    font-size: 14px;
+
+    line-height: 1.7;
+
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.experience-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 20px;
+
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.experience-card {
+
+    position: relative;
+
+    min-height: 390px;
+
+    overflow: hidden;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: flex-end;
+
+    padding: 28px;
+
+    border-radius: 28px;
+
+    color: white;
+
+    background: var(--ink);
+
+    isolation: isolate;
+
+    border:
+        1px solid
+        rgba(23, 74, 54, .08);
+
+    box-shadow:
+        0 15px 45px
+        rgba(13, 56, 41, .12);
+
+    transition:
+        transform .35s ease,
+        box-shadow .35s ease;
+
+}
+
+
+.experience-card:hover {
+
+    transform:
+        translateY(-8px);
+
+    box-shadow:
+        0 28px 65px
+        rgba(13, 56, 41, .2);
+
+}
+
+
+/* =========================================================
+   CARRUSEL
+========================================================= */
+
+.card-carousel {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 0;
+
+    overflow: hidden;
+
+}
+
+
+.card-carousel-image {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        opacity .2s ease,
+        transform .7s ease;
+
+}
+
+
+.experience-card:hover
+.card-carousel-image {
+
+    transform:
+        scale(1.04);
+
+}
+
+
+/* =========================================================
+   OVERLAY DE LA CARD
+========================================================= */
+
+.experience-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 1;
+
+    pointer-events: none;
+
+    background:
+
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, .05) 15%,
+            rgba(0, 0, 0, .08) 35%,
+            rgba(7, 31, 23, .88) 100%
+        );
+
+}
+
+
+/* =========================================================
+   CONTENIDO
+========================================================= */
+
+.experience-card-content {
+
+    position: relative;
+
+    z-index: 5;
+
+    max-width: 500px;
+
+}
+
+
+.experience-card-kicker {
+
+    margin-bottom: 9px;
+
+    color: var(--turquoise);
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: .17em;
+
+    text-transform: uppercase;
+
+}
+
+
+.experience-card h3 {
+
+    margin-bottom: 9px;
+
+    color: white;
+
+    font-family: var(--font-display);
+
+    font-size: 27px;
+
+    font-weight: 800;
+
+    line-height: 1.05;
+
+    letter-spacing: -.04em;
+
+}
+
+
+.experience-card p {
+
+    max-width: 470px;
+
+    margin-bottom: 17px;
+
+    color:
+        rgba(255, 255, 255, .72);
+
+    font-size: 12px;
+
+    line-height: 1.6;
+
+}
+
+
+.card-link {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    color: white;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    transition:
+        transform .25s ease;
+
+}
+
+
+.experience-card:hover
+.card-link {
+
+    transform:
+        translateX(5px);
+
+}
+
+
+/* =========================================================
+   FLECHAS DEL CARRUSEL
+========================================================= */
+
+.card-carousel-arrow {
+
+    position: absolute;
+
+    top: 50%;
+
+    z-index: 10;
+
+    width: 44px;
+
+    height: 44px;
+
+    display: grid;
+
+    place-items: center;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, .35);
+
+    border-radius: 50%;
+
+    background:
+        rgba(7, 31, 23, .58);
+
+    color: white;
+
+    font-size: 30px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    opacity: 0;
+
+    backdrop-filter:
+        blur(12px);
+
+    -webkit-backdrop-filter:
+        blur(12px);
+
+    transform:
+        translateY(-50%);
+
+    transition:
+        opacity .25s ease,
+        background .25s ease,
+        color .25s ease,
+        transform .25s ease;
+
+}
+
+
+.card-carousel-prev {
+
+    left: 16px;
+
+}
+
+
+.card-carousel-next {
+
+    right: 16px;
+
+}
+
+
+.experience-card:hover
+.card-carousel-arrow {
+
+    opacity: 1;
+
+}
+
+
+.card-carousel-arrow:hover {
+
+    background: white;
+
+    color: var(--ink);
+
+    transform:
+        translateY(-50%)
+        scale(1.1);
+
+}
+
+
+/* =========================================================
+   PUNTOS DEL CARRUSEL
+========================================================= */
+
+.card-carousel-dots {
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 20px;
+
+    z-index: 10;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    transform:
+        translateX(-50%);
+
+}
+
+
+.card-carousel-dot {
+
+    width: 7px;
+
+    height: 7px;
+
+    padding: 0;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, .5);
+
+    cursor: pointer;
+
+    transition:
+        width .25s ease,
+        background .25s ease,
+        transform .25s ease;
+
+}
+
+
+.card-carousel-dot:hover {
+
+    transform:
+        scale(1.15);
+
+}
+
+
+.card-carousel-dot.active {
+
+    width: 23px;
+
+    border-radius: 10px;
+
+    background: white;
+
+}
+
+
+/* =========================================================
+   REVEAL
+========================================================= */
+
+.reveal {
+
+    opacity: 1;
+
+    transform: none;
+
+    transition:
+        opacity .7s ease,
+        transform .7s ease;
+
+}
+
+
+.reveal.visible {
+
+    opacity: 1;
+
+    transform: none;
+
+}
+
+
+/* =========================================================
+   MAPA
+========================================================= */
+
+.map-section {
+
+    position: relative;
+
+    padding:
+        130px 24px;
+
+    overflow: hidden;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            #0d3829,
+            #174a36
+        );
+
+    color: white;
+
+    text-align: center;
+
+}
+
+
+.map-section::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 500px;
+
+    height: 500px;
+
+    top: -250px;
+
+    right: -120px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(130, 216, 167, .1);
+
+    filter:
+        blur(10px);
+
+}
+
+
+.map-section-content {
+
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 760px;
+
+    margin: auto;
+
+}
+
+
+.map-section .section-kicker {
+
+    color: var(--turquoise);
+
+}
+
+
+.map-section h2 {
+
+    margin-bottom: 22px;
+
+    color: white;
+
+}
+
+
+.map-section p {
+
+    max-width: 600px;
+
+    margin:
+        0 auto 30px;
+
+    color:
+        rgba(255, 255, 255, .68);
+
+    line-height: 1.7;
+
+}
+
+
+.map-section .hero-button {
+
+    background:
+        var(--turquoise);
+
+    color:
+        var(--ink-deep);
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+    padding:
+        35px 6%;
+
+    background:
+        #08291e;
+
+    color:
+        rgba(255, 255, 255, .65);
+
+    font-size: 12px;
+
+}
+
+
+.footer strong {
+
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: white;
+
+    font-family:
+        var(--font-display);
+
+    font-size: 15px;
+
+}
+
+
+.footer span {
+
+    color:
+        rgba(255, 255, 255, .45);
+
+}
+
+
+.footer p {
+
+    max-width: 300px;
+
+    text-align: right;
+
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .experience-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+
+    .hero {
+
+        min-height: 650px;
+
+        padding:
+            70px 7%;
+
+    }
+
+
+    .section-heading {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+}
+.usuario-nombre {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 8px 14px;
+
+    border-radius: 12px;
+
+    background: rgba(20, 184, 166, 0.10);
+
+    border: 1px solid rgba(20, 184, 166, 0.22);
+
+    color: #147d73;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    box-shadow: 0 3px 10px rgba(20, 184, 166, 0.08);
+
+    transition: all 0.25s ease;
+}
+
+.usuario-nombre::before {
+    content: "";
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #20b486;
+
+    box-shadow: 0 0 0 4px rgba(32, 180, 134, 0.12);
+}
+
+.usuario-nombre:hover {
+    background: rgba(20, 184, 166, 0.15);
+
+    border-color: rgba(20, 184, 166, 0.35);
+
+    transform: translateY(-1px);
+}
+/* =========================================
+   UBICACIÓN
+========================================= */
+
+.location-section {
+    width: 100%;
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 100px 5%;
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.location-content {
+    max-width: 600px;
+}
+
+.location-content h2 {
+    margin: 12px 0 20px;
+    color: var(--ink-deep);
+    font-family: var(--font-display);
+    font-size: clamp(34px, 4vw, 58px);
+    line-height: 1.05;
+    letter-spacing: -.05em;
+}
+
+.location-content > p {
+    margin: 0;
+    max-width: 540px;
+    color: rgba(23, 74, 54, .68);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+
+.location-info {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+
+.location-point {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 17px;
+    border: 1px solid rgba(23, 74, 54, .10);
+    border-radius: 17px;
+    background: rgba(255, 255, 255, .65);
+    box-shadow: 0 10px 30px rgba(13, 56, 41, .06);
+}
+
+
+.location-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(54, 166, 111, .11);
+    color: var(--water-dark);
+}
+
+
+.location-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+
+.location-point span {
+    display: block;
+    margin-bottom: 3px;
+    color: rgba(23, 74, 54, .42);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .14em;
+}
+
+
+.location-point strong {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+.location-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 30px;
+    padding: 14px 22px;
+    border-radius: 14px;
+    background: var(--ink);
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 12px 28px rgba(13, 56, 41, .15);
+    transition: transform .2s ease, background .2s ease;
+}
+
+
+.location-button:hover {
+    background: var(--water-dark);
+    color: white;
+    transform: translateY(-2px);
+}
+
+
+/* MAPA VISUAL */
+
+.location-map {
+    position: relative;
+    min-height: 470px;
+    overflow: hidden;
+    border-radius: 30px;
+    border: 1px solid rgba(23, 74, 54, .10);
+    background:
+        linear-gradient(
+            135deg,
+            #e8eee3 0%,
+            #f7f5e9 48%,
+            #dce9df 100%
+        );
+    box-shadow: 0 25px 60px rgba(13, 56, 41, .13);
+}
+
+
+/* Cuadrícula del mapa */
+
+.map-grid {
+    position: absolute;
+    inset: 0;
+    opacity: .28;
+    background-image:
+        linear-gradient(
+            rgba(23, 74, 54, .10) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(23, 74, 54, .10) 1px,
+            transparent 1px
+        );
+    background-size: 55px 55px;
+}
+
+
+/* Caminos */
+
+.map-road {
+    position: absolute;
+    height: 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .90);
+    box-shadow:
+        0 2px 4px rgba(23, 74, 54, .08);
+    transform-origin: center;
+}
+
+
+.road-one {
+    width: 115%;
+    top: 34%;
+    left: -8%;
+    transform: rotate(-17deg);
+}
+
+
+.road-two {
+    width: 105%;
+    top: 65%;
+    left: -4%;
+    transform: rotate(13deg);
+}
+
+
+.road-three {
+    width: 75%;
+    top: 8%;
+    left: 32%;
+    transform: rotate(73deg);
+}
+
+
+/* Agua */
+
+.map-water {
+    position: absolute;
+    width: 55%;
+    height: 70%;
+    right: -8%;
+    top: -10%;
+    border-radius: 45% 0 45% 55%;
+    background:
+        radial-gradient(
+            circle at 40% 50%,
+            rgba(130, 216, 167, .90),
+            rgba(54, 166, 111, .48)
+        );
+    transform: rotate(18deg);
+    opacity: .85;
+}
+
+
+/* Marcador */
+
+.map-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+}
+
+
+.map-marker {
+    position: absolute;
+    left: 48%;
+    top: 52%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.map-marker-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--water-dark);
+    border: 6px solid white;
+    box-shadow:
+        0 0 0 8px rgba(36, 125, 82, .18),
+        0 8px 20px rgba(13, 56, 41, .25);
+    animation: locationPulse 2s infinite;
+}
+
+
+.map-marker-label {
+    margin-top: 14px;
+    padding: 9px 14px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, .94);
+    border: 1px solid rgba(23, 74, 54, .10);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow: 0 8px 25px rgba(13, 56, 41, .12);
+}
+
+
+@keyframes locationPulse {
+
+    0% {
+        box-shadow:
+            0 0 0 8px rgba(36, 125, 82, .18),
+            0 8px 20px rgba(13, 56, 41, .25);
+    }
+
+    50% {
+        box-shadow:
+            0 0 0 16px rgba(36, 125, 82, .04),
+            0 8px 20px rgba(13, 56, 41, .25);
+    }
+
+    100% {
+        box-shadow:
+            0 0 0 8px rgba(36, 125, 82, .18),
+            0 8px 20px rgba(13, 56, 41, .25);
+    }
+
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 850px) {
+
+    .location-section {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 80px 5%;
+    }
+
+    .location-content {
+        max-width: 100%;
+    }
+
+    .location-map {
+        min-height: 380px;
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .location-section {
+        padding: 65px 5%;
+    }
+
+    .location-content h2 {
+        font-size: 36px;
+    }
+
+    .location-map {
+        min-height: 300px;
+        border-radius: 22px;
+    }
+
+    .location-point {
+        align-items: flex-start;
+    }
+
+    .location-button {
+        width: 100%;
+    }
+
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+
+    /* NAVBAR */
+
+    body {
+
+        padding-top: 64px;
+
+    }
+
+
+    .main-navbar {
+
+        min-height: 64px;
+
+    }
+
+
+    .nav-container {
+
+        min-height: 64px;
+
+        padding:
+            0 16px;
+
+        gap: 12px;
+
+    }
+
+
+    .nav-logo {
+
+        font-size: 17px;
+
+    }
+
+
+    .nav-links {
+
+        flex: 1;
+
+        overflow-x: auto;
+
+        justify-content: flex-start;
+
+        scrollbar-width: none;
+
+    }
+
+
+    .nav-links::-webkit-scrollbar {
+
+        display: none;
+
+    }
+
+
+    .nav-links a {
+
+        padding:
+            8px 10px;
+
+        font-size: 11px;
+
+        white-space: nowrap;
+
+    }
+
+
+    #inicio,
+    #sobre-laguna,
+    #experiencias,
+    #mapa {
+
+        scroll-margin-top: 78px;
+
+    }
+
+
+    /* HERO */
+
+    .hero {
+
+        min-height: 620px;
+
+        padding:
+            60px 24px;
+
+    }
+
+
+    .hero h1 {
+
+        font-size: 62px;
+
+    }
+
+
+    .hero p {
+
+        font-size: 15px;
+
+    }
+
+
+    /* INTRO */
+
+    .intro-section {
+
+        padding:
+            80px 24px 60px;
+
+    }
+
+
+    /* EXPERIENCIAS */
+
+    .experiences-section {
+
+        padding:
+            60px 18px 80px;
+
+    }
+
+
+    .experience-grid {
+
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+
+    }
+
+
+    .experience-card {
+
+        min-height: 430px;
+
+        padding: 24px;
+
+    }
+
+
+    /* FLECHAS VISIBLES EN CELULAR */
+
+    .card-carousel-arrow {
+
+        width: 40px;
+
+        height: 40px;
+
+        opacity: 1;
+
+        font-size: 27px;
+
+    }
+
+
+    .card-carousel-prev {
+
+        left: 12px;
+
+    }
+
+
+    .card-carousel-next {
+
+        right: 12px;
+
+    }
+
+
+    .card-carousel-dots {
+
+        bottom: 17px;
+
+    }
+
+
+    /* FOOTER */
+
+    .footer {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+
+    .footer p {
+
+        text-align: left;
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE PEQUEÑO
+========================================================= */
+
+@media (max-width: 450px) {
+
+
+    .nav-logo {
+
+        font-size: 15px;
+
+    }
+
+
+    .nav-links {
+
+        gap: 2px;
+
+    }
+
+
+    .nav-links a {
+
+        padding:
+            7px 8px;
+
+        font-size: 10px;
+
+    }
+
+
+    .hero {
+
+        min-height: 570px;
+
+    }
+
+
+    .hero h1 {
+
+        font-size: 53px;
+
+    }
+
+
+    .experience-card {
+
+        min-height: 400px;
+
+    }
+
+
+    .experience-card h3 {
+
+        font-size: 24px;
+
+    }
+
+
+    .experience-card p {
+
+        font-size: 11px;
+
+    }
+
+}

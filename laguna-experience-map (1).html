@@ -1,0 +1,4306 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Laguna Experience</title>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --green:#173f2c;
+    --green2:#245d43;
+    --sage:#7f9f82;
+    --cream:#f4efdf;
+    --white:#ffffff;
+    --glass:rgba(12,35,25,.9);
+    --border:rgba(255,255,255,.15);
+}
+
+body{
+    overflow:hidden;
+    font-family:system-ui, -apple-system, sans-serif;
+    background:#102c20;
+    color:white;
+}
+
+#game{
+    position:fixed;
+    inset:0;
+}
+
+canvas{
+    display:block;
+    width:100%;
+    height:100%;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+#loading{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    background:radial-gradient(circle at center, #245d43 0%, #102c20 55%, #071710 100%);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    transition:.6s;
+}
+
+.loading-box{
+    width:min(420px, 90%);
+    text-align:center;
+}
+
+.loading-logo{
+    font-size:clamp(36px, 8vw, 54px);
+    font-weight:800;
+    letter-spacing:-2px;
+}
+
+.loading-logo span{
+    color:#d8d0a7;
+}
+
+.loading-sub{
+    margin-top:6px;
+    opacity:.65;
+    font-size:clamp(10px, 2.5vw, 14px);
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+
+.progress{
+    margin-top:24px;
+    height:4px;
+    background:rgba(255,255,255,.15);
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress-bar{
+    width:0%;
+    height:100%;
+    background:#d8d0a7;
+    transition:.2s;
+}
+
+.loading-text{
+    margin-top:10px;
+    font-size:11px;
+    opacity:.6;
+}
+
+/* =========================
+   GLASS EFFECT
+========================= */
+
+.glass{
+    background:var(--glass);
+    border:1px solid var(--border);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+
+/* =========================
+   CABECERA (Brand & Status)
+========================= */
+
+#brand{
+    position:fixed;
+    z-index:30;
+    left:10px;
+    top:10px;
+    padding:8px 12px;
+    border-radius:12px;
+}
+
+.brand-title{
+    font-size:16px;
+    font-weight:800;
+    letter-spacing:-1px;
+}
+
+.brand-title span{
+    color:#b9cda6;
+}
+
+.brand-sub{
+    font-size:7px;
+    opacity:.6;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+#status{
+    position:fixed;
+    z-index:30;
+    right:10px;
+    top:10px;
+    padding:8px 12px;
+    border-radius:12px;
+    min-width:130px;
+}
+
+.status-row{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    font-size:9px;
+    margin-bottom:2px;
+}
+
+.status-row:last-child{
+    margin-bottom:0;
+}
+
+.status-label{
+    opacity:.55;
+}
+
+.status-value{
+    font-weight:700;
+}
+
+/* =========================
+   SEARCH PANEL (Drawer Responsive)
+========================= */
+
+#search-panel{
+    position:fixed;
+    z-index:80;
+    right:0;
+    top:0;
+    width:min(90vw, 300px);
+    height:100vh;
+    height:100dvh;
+    border-radius:20px 0 0 20px;
+    transform:translateX(105%);
+    transition:transform .3s cubic-bezier(0.1, 0.9, 0.2, 1);
+    display:flex;
+    flex-direction:column;
+}
+
+#search-panel.mobile-open{
+    transform:translateX(0);
+}
+
+.search-head{
+    padding:16px 12px 10px;
+    border-bottom:1px solid var(--border);
+}
+
+.search-title{
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:6px;
+}
+
+#search{
+    width:100%;
+    border:none;
+    outline:none;
+    color:white;
+    background:rgba(255,255,255,.08);
+    padding:8px 10px;
+    border-radius:8px;
+    font-size:12px;
+}
+
+#business-list{
+    flex:1;
+    overflow-y:auto;
+    padding:6px;
+}
+
+.business-item{
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-bottom:3px;
+}
+
+.business-item:hover,
+.business-item.active{
+    background:rgba(216,208,167,.15);
+    border:1px solid rgba(216,208,167,.25);
+}
+
+.business-name{
+    font-size:12px;
+    font-weight:700;
+}
+
+.business-category{
+    margin-top:2px;
+    font-size:10px;
+    opacity:.5;
+}
+
+#search-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:75;
+    background:rgba(0,0,0,0.5);
+    backdrop-filter:blur(3px);
+    display:none;
+}
+
+#search-backdrop.mobile-open{
+    display:block;
+}
+
+/* =========================
+   INFO PANEL (Tarjeta Flotante)
+========================= */
+
+#info{
+    position:fixed;
+    z-index:70;
+    left:10px;
+    right:10px;
+    bottom:15px; /* Arriba del todo en la parte inferior cuando se abre */
+    max-width:450px;
+    margin:0 auto;
+    padding:12px 16px;
+    border-radius:16px;
+    max-height:30vh;
+    overflow-y:auto;
+    transform:translateY(200%);
+    transition:transform .3s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+#info.open{
+    transform:translateY(0);
+}
+
+.info-close{
+    position:absolute;
+    right:10px;
+    top:8px;
+    border:none;
+    background:none;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    padding:4px;
+}
+
+.info-category{
+    color:#b9cda6;
+    font-size:8px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+
+#info-title{
+    font-size:16px;
+    margin-top:2px;
+}
+
+#info-description{
+    margin-top:4px;
+    line-height:1.3;
+    font-size:11px;
+    opacity:.75;
+}
+
+.info-status{
+    display:inline-block;
+    margin-top:6px;
+    padding:2px 6px;
+    background:rgba(130,190,130,.15);
+    border:1px solid rgba(130,190,130,.2);
+    border-radius:10px;
+    font-size:8px;
+}
+
+.info-buttons{
+    display:flex;
+    gap:6px;
+    margin-top:8px;
+}
+
+.btn{
+    border:none;
+    cursor:pointer;
+    border-radius:8px;
+    padding:6px 10px;
+    font-weight:700;
+    font-size:10px;
+}
+
+.btn-primary{
+    background:#d8d0a7;
+    color:#173f2c;
+}
+
+.btn-secondary{
+    background:rgba(255,255,255,.1);
+    color:white;
+}
+
+/* =========================
+   ELEMENTOS MÓVILES (Distribución Limpia)
+========================= */
+
+#mobile-hint{
+    position:fixed;
+    z-index:25;
+    left:50%;
+    top:65px;
+    transform:translateX(-50%);
+    padding:4px 10px;
+    border-radius:999px;
+    background:rgba(10,28,19,.75);
+    border:1px solid rgba(255,255,255,.12);
+    color:rgba(255,255,255,.85);
+    font-size:8px;
+    white-space:nowrap;
+    backdrop-filter:blur(6px);
+    pointer-events:none;
+}
+
+#mobile-search-toggle{
+    display:flex;
+    position:fixed;
+    z-index:60;
+    top:65px;
+    right:10px;
+    width:36px;
+    height:36px;
+    align-items:center;
+    justify-content:center;
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:10px;
+    background:rgba(15,40,28,.9);
+    color:white;
+    font-size:16px;
+}
+
+/* Controles Táctiles (D-Pad Movimiento abajo a la izquierda) */
+#mobile-controls{
+    display:block;
+    position:fixed;
+    z-index:50;
+    left:10px;
+    bottom:15px;
+    width:110px;
+    height:110px;
+}
+
+.mobile-btn{
+    position:absolute;
+    width:36px;
+    height:36px;
+    border-radius:9px;
+    border:1px solid rgba(255,255,255,.15);
+    background:rgba(15,40,28,.9);
+    color:white;
+    touch-action:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+}
+
+.mobile-up    { left:37px; top:0; }
+.mobile-left  { left:0;    top:37px; }
+.mobile-down  { left:37px; top:37px; }
+.mobile-right { left:74px; top:37px; }
+
+/* Minimapa ubicado a la derecha de los controles de movimiento, sin pisarlos */
+#minimap-box{
+    position:fixed;
+    z-index:50;
+    left:128px;
+    bottom:15px;
+    width:110px;
+    padding:4px;
+    border-radius:10px;
+}
+
+#minimap{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:6px;
+    background:#244b35;
+}
+
+/* Botones rápidos (Vistas, Centrar y Zoom) ordenados abajo a la derecha */
+#mobile-quick{
+    display:flex;
+    position:fixed;
+    z-index:50;
+    right:10px;
+    bottom:15px;
+    flex-direction:column;
+    gap:6px;
+}
+
+.quick-btn{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:10px;
+    background:rgba(15,40,28,.9);
+    color:white;
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    cursor:pointer;
+}
+
+.quick-btn:active{
+    transform:scale(0.92);
+    background:rgba(25,65,45,.95);
+}
+
+/* =========================
+   VERSIÓN DE ESCRITORIO (PC / Tablets grandes)
+========================= */
+
+#toolbar{
+    display:none;
+}
+
+@media(min-width: 900px){
+    #mobile-controls,
+    #mobile-quick,
+    #mobile-search-toggle,
+    #mobile-hint{
+        display:none !important;
+    }
+
+    #toolbar{
+        display:flex;
+        position:fixed;
+        z-index:30;
+        left:50%;
+        bottom:15px;
+        transform:translateX(-50%);
+        gap:6px;
+        padding:6px;
+        border-radius:12px;
+    }
+
+    .tool{
+        width:38px;
+        height:38px;
+        border:none;
+        border-radius:8px;
+        background:rgba(255,255,255,.08);
+        color:white;
+        cursor:pointer;
+        transition:.2s;
+    }
+    .tool:hover{
+        background:rgba(255,255,255,.2);
+    }
+
+    #minimap-box{
+        bottom:15px;
+        right:15px;
+        width:150px;
+        left:auto;
+    }
+
+    #info{
+        left:auto;
+        right:20px;
+        bottom:20px;
+        width:320px;
+        max-height:none;
+        transform:translateX(350px);
+    }
+    #info.open{
+        transform:translateX(0);
+    }
+}
+
+/* Toast General */
+#toast{
+    position:fixed;
+    z-index:100;
+    left:50%;
+    top:55px;
+    transform:translate(-50%,-20px);
+    opacity:0;
+    pointer-events:none;
+    background:rgba(10,25,18,.9);
+    border:1px solid rgba(255,255,255,.15);
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:10px;
+    transition:.3s;
+}
+
+#toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- =========================
+     LOADING
+========================= -->
+
+<div id="loading">
+
+    <div class="loading-box">
+
+        <div class="loading-logo">
+            laguna<span>.</span>
+        </div>
+
+        <div class="loading-sub">
+            Smart Experience Park
+        </div>
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="progress-bar"
+            ></div>
+
+        </div>
+
+        <div
+            class="loading-text"
+            id="loading-text"
+        >
+            Preparando experiencia...
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="game"></div>
+
+
+<!-- =========================
+     BRAND
+========================= -->
+
+<div
+    id="brand"
+    class="glass"
+>
+
+    <div class="brand-title">
+        laguna<span>.</span>
+    </div>
+
+    <div class="brand-sub">
+        Smart Experience Park
+    </div>
+
+</div>
+
+
+<!-- =========================
+     STATUS
+========================= -->
+
+<div
+    id="status"
+    class="glass"
+>
+
+    <div class="status-row">
+
+        <span class="status-label">
+            Zona
+        </span>
+
+        <span
+            class="status-value"
+            id="zone"
+        >
+            Laguna Central
+        </span>
+
+    </div>
+
+    <div class="status-row">
+
+        <span class="status-label">
+            Ubicación
+        </span>
+
+        <span
+            class="status-value"
+            id="location"
+        >
+            Entrada
+        </span>
+
+    </div>
+
+    <div class="status-row">
+
+        <span class="status-label">
+            Estado
+        </span>
+
+        <span class="status-value">
+            ● Operativo
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     SEARCH
+========================= -->
+
+<div
+    id="search-panel"
+    class="glass"
+>
+
+    <div class="search-head">
+
+        <div class="search-title">
+            Explorar Laguna
+        </div>
+
+        <input
+            id="search"
+            type="text"
+            placeholder="Buscar lugar..."
+        >
+
+    </div>
+
+    <div id="business-list"></div>
+
+</div>
+
+
+<!-- =========================
+     INFO
+========================= -->
+
+<div
+    id="info"
+    class="glass"
+>
+
+    <button
+        class="info-close"
+        onclick="closeInfo()"
+    >
+        ×
+    </button>
+
+    <div
+        class="info-category"
+        id="info-category"
+    >
+        EXPERIENCIA
+    </div>
+
+    <div id="info-title">
+        Laguna Experience
+    </div>
+
+    <div id="info-description">
+        Seleccioná un lugar del parque
+        para conocerlo.
+    </div>
+
+    <div class="info-status">
+        ● Disponible
+    </div>
+
+    <div class="info-buttons">
+
+        <button
+            class="btn btn-primary"
+            id="route-button"
+        >
+            IR HASTA AQUÍ
+        </button>
+
+        <button
+            class="btn btn-secondary"
+            onclick="closeInfo()"
+        >
+            CERRAR
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     TOOLBAR
+========================= -->
+
+<div
+    id="toolbar"
+    class="glass"
+>
+
+    <button
+        class="tool"
+        onclick="toggleTopView()"
+        title="Vista aérea"
+    >
+        ⬆
+    </button>
+
+    <button
+        class="tool"
+        onclick="resetCamera()"
+        title="Reset cámara"
+    >
+        ◉
+    </button>
+
+    <button
+        class="tool"
+        onclick="centerPlayer()"
+        title="Ubicarme"
+    >
+        ◎
+    </button>
+
+    <button
+        class="tool"
+        onclick="cancelRoute()"
+        title="Cancelar ruta"
+    >
+        ×
+    </button>
+
+</div>
+
+
+<!-- =========================
+     MINIMAP
+========================= -->
+
+<div
+    id="minimap-box"
+    class="glass"
+>
+
+    <canvas
+        id="minimap"
+        width="300"
+        height="220"
+    ></canvas>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<!-- =========================
+     MOBILE
+========================= -->
+
+<div id="mobile-hint">Arrastrá para mirar · mantené presionada una flecha para caminar</div>
+
+<button id="mobile-search-toggle" class="mobile-menu-btn" aria-label="Abrir buscador">⌕</button>
+<div id="search-backdrop"></div>
+
+<div id="mobile-quick">
+    <button class="quick-btn" id="mobile-center" title="Centrar ubicación">◎</button>
+    <button class="quick-btn" id="mobile-view" title="Cambiar vista">◈</button>
+    <button class="quick-btn" id="mobile-zoom-in" title="Acercar">＋</button>
+    <button class="quick-btn" id="mobile-zoom-out" title="Alejar">−</button>
+</div>
+
+<div id="mobile-controls">
+
+    <button
+        class="mobile-btn mobile-up"
+        data-key="w"
+    >
+        ▲
+    </button>
+
+    <button
+        class="mobile-btn mobile-left"
+        data-key="a"
+    >
+        ◀
+    </button>
+
+    <button
+        class="mobile-btn mobile-down"
+        data-key="s"
+    >
+        ▼
+    </button>
+
+    <button
+        class="mobile-btn mobile-right"
+        data-key="d"
+    >
+        ▶
+    </button>
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let scene;
+let camera;
+let renderer;
+let clock;
+
+let player;
+let playerGroup;
+
+let buildings = [];
+let buildingMeshes = [];
+let obstacles = [];
+let npcs = [];
+
+let selectedBusiness = null;
+let selectedBuilding = null;
+let hoveredBuilding = null;
+
+let routeLine = null;
+let routePoints = [];
+let routeIndex = 0;
+let routeMoving = false;
+
+let keys = {};
+
+let topView = false;
+
+let cameraDistance = 22;
+let cameraAngle = 0.7;
+let cameraHeight = 10;
+
+let targetCameraPosition = new THREE.Vector3();
+let cameraTarget = new THREE.Vector3();
+
+let mouseDown = false;
+let mouseMoved = false;
+
+let lastMouseX = 0;
+let lastMouseY = 0;
+
+let waterTime = 0;
+let water = null;
+let poolWater = null;
+
+let toastTimer = null;
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+
+/* =========================================================
+   DATOS
+========================================================= */
+
+const businessData = [
+
+    {
+        id:1,
+        name:"Cabañas",
+        label:"CABAÑAS",
+        category:"Alojamiento",
+        x:-68,
+        z:-48,
+        color:0x9b7653,
+        description:"Cabañas rodeadas de naturaleza para disfrutar una estadía tranquila junto a la laguna.",
+        routeX:-68,
+        routeZ:-37
+    },
+
+    {
+        id:2,
+        name:"Glamping",
+        label:"GLAMPING",
+        category:"Alojamiento",
+        x:-43,
+        z:-48,
+        color:0x866e52,
+        description:"Una experiencia de alojamiento diferente combinando naturaleza, comodidad y diseño.",
+        routeX:-43,
+        routeZ:-37
+    },
+
+    {
+        id:3,
+        name:"Spa & Wellness",
+        label:"SPA",
+        category:"Bienestar",
+        x:43,
+        z:-48,
+        color:0x718b7c,
+        description:"Espacio dedicado al descanso, masajes, relajación y bienestar.",
+        routeX:43,
+        routeZ:-37
+    },
+
+    {
+        id:4,
+        name:"Beach Club",
+        label:"BEACH CLUB",
+        category:"Entretenimiento",
+        x:68,
+        z:-48,
+        color:0xd8ad68,
+        description:"Sector de playa, descanso y actividades para disfrutar junto al agua.",
+        routeX:68,
+        routeZ:-37
+    },
+
+    {
+        id:5,
+        name:"Restaurante",
+        label:"RESTAURANTE",
+        category:"Gastronomía",
+        x:-68,
+        z:48,
+        color:0x9c674d,
+        description:"Restaurante principal con gastronomía y espacios para compartir.",
+        routeX:-68,
+        routeZ:37
+    },
+
+    {
+        id:6,
+        name:"Mundo Cookie",
+        label:"MUNDO COOKIE",
+        category:"Gastronomía",
+        x:-43,
+        z:48,
+        color:0xc88c68,
+        description:"Un espacio temático pensado para disfrutar productos dulces y experiencias familiares.",
+        routeX:-43,
+        routeZ:37
+    },
+
+    {
+        id:7,
+        name:"Emprendedores",
+        label:"EMPRENDEDORES",
+        category:"Comercial",
+        x:43,
+        z:48,
+        color:0x78906d,
+        description:"Paseo de emprendimientos y productos locales.",
+        routeX:43,
+        routeZ:37
+    },
+
+    {
+        id:8,
+        name:"Actividades Acuáticas",
+        label:"ACTIVIDADES",
+        category:"Náutica",
+        x:68,
+        z:48,
+        color:0x547d89,
+        description:"Actividades recreativas sobre la laguna, incluyendo kayaks y propuestas acuáticas.",
+        routeX:68,
+        routeZ:37
+    },
+
+    {
+        id:9,
+        name:"Parque Aventura",
+        label:"AVENTURA",
+        category:"Entretenimiento",
+        x:-72,
+        z:5,
+        color:0x69774d,
+        description:"Circuitos de aventura y actividades al aire libre.",
+        routeX:-60,
+        routeZ:5
+    },
+
+    {
+        id:10,
+        name:"Sector Infantil",
+        label:"INFANTIL",
+        category:"Familias",
+        x:-72,
+        z:-10,
+        color:0xc2925b,
+        description:"Espacio diseñado para que los más chicos puedan jugar y divertirse.",
+        routeX:-60,
+        routeZ:-10
+    },
+
+    {
+        id:11,
+        name:"Eventos",
+        label:"EVENTOS",
+        category:"Eventos",
+        x:72,
+        z:5,
+        color:0x725b7e,
+        description:"Espacio para eventos, encuentros, celebraciones y actividades especiales.",
+        routeX:60,
+        routeZ:5
+    },
+
+    {
+        id:12,
+        name:"Experiencias",
+        label:"EXPERIENCIAS",
+        category:"Actividades",
+        x:72,
+        z:-10,
+        color:0x617c76,
+        description:"Punto de partida para diferentes experiencias y actividades dentro del parque.",
+        routeX:60,
+        routeZ:-10
+    }
+
+];
+
+
+/* =========================================================
+   INICIO
+========================================================= */
+
+window.addEventListener("load",function(){
+
+    startLoading();
+
+    try{
+
+        init();
+
+        if(renderer && scene && camera && clock){
+            animate();
+        }
+
+    }catch(error){
+
+        console.error("Error iniciando Laguna Experience:",error);
+
+        const loadingText =
+            document.getElementById("loading-text");
+
+        const progressBar =
+            document.getElementById("progress-bar");
+
+        if(loadingText){
+            loadingText.textContent =
+                "Error al iniciar la experiencia.";
+        }
+
+        if(progressBar){
+            progressBar.style.background =
+                "#d66";
+        }
+
+    }
+
+});
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+function startLoading(){
+
+    let progress = 0;
+
+    const interval = setInterval(function(){
+
+        progress += Math.random() * 18;
+
+        if(progress >= 100){
+
+            progress = 100;
+
+            clearInterval(interval);
+
+            document.getElementById("loading-text").textContent =
+                "Experiencia lista";
+
+            setTimeout(function(){
+
+                const loading =
+                    document.getElementById("loading");
+
+                loading.style.opacity = "0";
+
+                setTimeout(function(){
+
+                    loading.style.display = "none";
+
+                },600);
+
+            },400);
+
+        }
+
+        document.getElementById("progress-bar").style.width =
+            progress + "%";
+
+        if(progress < 30){
+
+            document.getElementById("loading-text").textContent =
+                "Preparando el parque...";
+
+        }else if(progress < 60){
+
+            document.getElementById("loading-text").textContent =
+                "Construyendo espacios...";
+
+        }else if(progress < 90){
+
+            document.getElementById("loading-text").textContent =
+                "Preparando experiencias...";
+
+        }
+
+    },120);
+
+}
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+function init(){
+
+    if(typeof THREE === "undefined"){
+        throw new Error("Three.js no pudo cargarse.");
+    }
+
+    scene = new THREE.Scene();
+
+    scene.background =
+        new THREE.Color(0x9eb8a1);
+
+    scene.fog =
+        new THREE.Fog(
+            0x9eb8a1,
+            130,
+            260
+        );
+
+    clock = new THREE.Clock();
+
+    camera =
+        new THREE.PerspectiveCamera(
+            55,
+            window.innerWidth / window.innerHeight,
+            .1,
+            500
+        );
+
+    camera.position.set(0,12,22);
+
+    renderer =
+        new THREE.WebGLRenderer({
+            antialias:true,
+            powerPreference:"high-performance"
+        });
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+    renderer.setPixelRatio(
+        Math.min(window.devicePixelRatio,2)
+    );
+
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type =
+        THREE.PCFSoftShadowMap;
+
+    renderer.outputColorSpace =
+        THREE.SRGBColorSpace;
+
+    renderer.toneMapping =
+        THREE.ACESFilmicToneMapping;
+
+    renderer.toneMappingExposure = 1.15;
+
+    document
+        .getElementById("game")
+        .appendChild(renderer.domElement);
+
+    createLights();
+    createGround();
+    createLake();
+    createRoads();
+    createBuildings();
+    createPool();
+    createEnvironment();
+    createPlayer();
+    createNPCs();
+    createBusinessList();
+    setupEvents();
+
+    window.addEventListener("resize",onResize);
+
+}
+
+
+/* =========================================================
+   LUCES
+========================================================= */
+
+function createLights(){
+
+    const hemisphere =
+        new THREE.HemisphereLight(
+            0xddebdc,
+            0x36543e,
+            2
+        );
+
+    scene.add(hemisphere);
+
+    const sun =
+        new THREE.DirectionalLight(
+            0xfff4d8,
+            3
+        );
+
+    sun.position.set(-60,100,-50);
+
+    sun.castShadow = true;
+
+    sun.shadow.mapSize.width = 2048;
+    sun.shadow.mapSize.height = 2048;
+
+    sun.shadow.camera.left = -130;
+    sun.shadow.camera.right = 130;
+    sun.shadow.camera.top = 130;
+    sun.shadow.camera.bottom = -130;
+
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far = 300;
+
+    scene.add(sun);
+
+}
+
+
+/* =========================================================
+   GROUND
+========================================================= */
+
+function createGround(){
+
+    const geometry =
+        new THREE.PlaneGeometry(210,170);
+
+    const material =
+        new THREE.MeshStandardMaterial({
+            color:0x557b4e,
+            roughness:1
+        });
+
+    const ground =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+    ground.rotation.x =
+        -Math.PI / 2;
+
+    ground.receiveShadow = true;
+
+    scene.add(ground);
+
+    const borderMaterial =
+        new THREE.MeshStandardMaterial({
+            color:0x355a3b,
+            roughness:1
+        });
+
+    const border =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                214,
+                1,
+                174
+            ),
+            borderMaterial
+        );
+
+    border.position.y = -.8;
+
+    scene.add(border);
+
+}
+
+
+/* =========================================================
+   LAGO
+========================================================= */
+
+function createLake(){
+
+    const beach =
+        new THREE.Mesh(
+            new THREE.CircleGeometry(36,80),
+            new THREE.MeshStandardMaterial({
+                color:0xd8c596,
+                roughness:1
+            })
+        );
+
+    beach.rotation.x =
+        -Math.PI / 2;
+
+    beach.scale.set(1.35,.68,1);
+
+    beach.position.y = .02;
+
+    scene.add(beach);
+
+    const geometry =
+        new THREE.CircleGeometry(32,80);
+
+    const material =
+        new THREE.MeshStandardMaterial({
+            color:0x4e9a9d,
+            roughness:.2,
+            metalness:.05,
+            transparent:true,
+            opacity:.9
+        });
+
+    water =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+    water.rotation.x =
+        -Math.PI / 2;
+
+    water.scale.set(1.35,.68,1);
+
+    water.position.y = .13;
+
+    scene.add(water);
+
+    for(let i=0;i<3;i++){
+
+        const ripple =
+            new THREE.Mesh(
+                new THREE.TorusGeometry(
+                    8 + i*6,
+                    .08,
+                    8,
+                    64
+                ),
+                new THREE.MeshBasicMaterial({
+                    color:0xb8e4df,
+                    transparent:true,
+                    opacity:.22
+                })
+            );
+
+        ripple.rotation.x =
+            Math.PI / 2;
+
+        ripple.scale.set(1.35,.68,1);
+
+        ripple.position.y =
+            .19 + i*.015;
+
+        scene.add(ripple);
+
+    }
+
+    obstacles.push({
+        type:"lake"
+    });
+
+}
+
+
+/* =========================================================
+   PILETA BEACH CLUB
+========================================================= */
+
+function createPool(){
+
+    /*
+        Pileta ubicada cerca del Beach Club.
+        Está fuera de la laguna principal.
+        Coordenadas aproximadas:
+        x = 82
+        z = -28
+    */
+
+    const poolGroup =
+        new THREE.Group();
+
+    poolGroup.position.set(
+        82,
+        0,
+        -28
+    );
+
+    /* BORDE */
+
+    const poolBorder =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                22,
+                .35,
+                13
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0xe3d5b2,
+                roughness:.9
+            })
+        );
+
+    poolBorder.position.y = .18;
+
+    poolBorder.receiveShadow = true;
+
+    poolGroup.add(poolBorder);
+
+
+    /* AGUA */
+
+    const pool =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                19,
+                .18,
+                10
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0x48a8b5,
+                roughness:.15,
+                metalness:.05,
+                transparent:true,
+                opacity:.94
+            })
+        );
+
+    pool.position.y = .4;
+
+    pool.receiveShadow = true;
+
+    poolGroup.add(pool);
+
+    poolWater = pool;
+
+
+    /* ESCALERA */
+
+    const stairMaterial =
+        new THREE.MeshStandardMaterial({
+            color:0xe9e0c9
+        });
+
+    for(let i=0;i<3;i++){
+
+        const step =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    3,
+                    .18,
+                    .65
+                ),
+                stairMaterial
+            );
+
+        step.position.set(
+            -6 + i*.8,
+            .55 + i*.08,
+            0
+        );
+
+        poolGroup.add(step);
+
+    }
+
+
+    /* CAMASTROS */
+
+    const loungerMaterial =
+        new THREE.MeshStandardMaterial({
+            color:0xf1e4c5
+        });
+
+    for(let i=0;i<3;i++){
+
+        const lounger =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    2.8,
+                    .15,
+                    .9
+                ),
+                loungerMaterial
+            );
+
+        lounger.position.set(
+            0 + i*3.2,
+            .45,
+            -7
+        );
+
+        lounger.rotation.y =
+            -.08;
+
+        poolGroup.add(lounger);
+
+    }
+
+
+    /* CARTEL */
+
+    const sign =
+        createSign("PILETA");
+
+    sign.position.set(
+        0,
+        3.2,
+        6.7
+    );
+
+    poolGroup.add(sign);
+
+
+    scene.add(poolGroup);
+
+    /*
+        La pileta se considera obstáculo.
+        Así el jugador no puede atravesarla.
+    */
+
+    obstacles.push({
+        type:"pool",
+        x:82,
+        z:-28,
+        w:19,
+        d:10
+    });
+
+}
+
+
+/* =========================================================
+   ROADS
+========================================================= */
+
+function createRoads(){
+
+    const roadMaterial =
+        new THREE.MeshStandardMaterial({
+            color:0x77766d,
+            roughness:1
+        });
+
+    const sideMaterial =
+        new THREE.MeshStandardMaterial({
+            color:0x9a987f,
+            roughness:1
+        });
+
+    function road(x,z,w,d){
+
+        const side =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    w + 1.5,
+                    .12,
+                    d + 1.5
+                ),
+                sideMaterial
+            );
+
+        side.position.set(x,.07,z);
+
+        side.receiveShadow = true;
+
+        scene.add(side);
+
+        const r =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    w,
+                    .15,
+                    d
+                ),
+                roadMaterial
+            );
+
+        r.position.set(x,.13,z);
+
+        r.receiveShadow = true;
+
+        scene.add(r);
+
+    }
+
+    /*
+        CAMINOS PERIMETRALES.
+        NO SE CONSTRUYE NINGÚN CAMINO SOBRE EL AGUA.
+    */
+
+    road(-68,0,54,7);
+    road(68,0,54,7);
+
+    road(0,-51,7,42);
+    road(0,51,7,42);
+
+    road(-58,0,6,145);
+    road(58,0,6,145);
+
+    road(0,-40,190,6);
+    road(0,40,190,6);
+
+    /*
+        ACCESO AL BEACH CLUB Y PILETA
+    */
+
+    road(
+        80,
+        -38,
+        42,
+        5
+    );
+
+    road(
+        92,
+        -28,
+        5,
+        20
+    );
+
+}
+
+
+/* =========================================================
+   BUILDINGS
+========================================================= */
+
+function createBuildings(){
+
+    businessData.forEach(function(data){
+
+        const group =
+            createBuilding(data);
+
+        buildings.push(group);
+
+        scene.add(group);
+
+        buildingMeshes.push(
+            group.userData.clickMesh
+        );
+
+        obstacles.push({
+            type:"building",
+            x:data.x,
+            z:data.z,
+            w:10,
+            d:9
+        });
+
+    });
+
+}
+
+
+function createBuilding(data){
+
+    const group =
+        new THREE.Group();
+
+    group.position.set(
+        data.x,
+        0,
+        data.z
+    );
+
+    group.userData.business =
+        data;
+
+    const body =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                10,
+                5,
+                8
+            ),
+            new THREE.MeshStandardMaterial({
+                color:data.color,
+                roughness:.8
+            })
+        );
+
+    body.position.y = 2.5;
+
+    body.castShadow = true;
+    body.receiveShadow = true;
+
+    group.add(body);
+
+    group.userData.clickMesh = body;
+
+    body.userData.building = group;
+
+
+    const roof =
+        new THREE.Mesh(
+            new THREE.ConeGeometry(
+                7.5,
+                3.5,
+                4
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0x443f38,
+                roughness:.85
+            })
+        );
+
+    roof.rotation.y =
+        Math.PI / 4;
+
+    roof.position.y = 6.6;
+
+    roof.castShadow = true;
+
+    group.add(roof);
+
+
+    for(let side of [-1,1]){
+
+        for(let i=-1;i<=1;i++){
+
+            const windowMesh =
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        1.4,
+                        1.5,
+                        .12
+                    ),
+                    new THREE.MeshStandardMaterial({
+                        color:0xb8d4cc,
+                        emissive:0x27453c,
+                        emissiveIntensity:.3
+                    })
+                );
+
+            windowMesh.position.set(
+                i*2.5,
+                2.9,
+                side*4.05
+            );
+
+            group.add(windowMesh);
+
+        }
+
+    }
+
+
+    const door =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                1.5,
+                2.6,
+                .15
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0x3b2a20
+            })
+        );
+
+    door.position.set(
+        0,
+        1.3,
+        4.05
+    );
+
+    group.add(door);
+
+
+    const sign =
+        createSign(data.label);
+
+    sign.position.set(
+        0,
+        7.8,
+        4.2
+    );
+
+    group.add(sign);
+
+
+    const lamp =
+        new THREE.PointLight(
+            0xffdca1,
+            .8,
+            14
+        );
+
+    lamp.position.set(
+        0,
+        4,
+        5
+    );
+
+    group.add(lamp);
+
+    return group;
+
+}
+
+
+/* =========================================================
+   SIGN
+========================================================= */
+
+function createSign(text){
+
+    const canvas =
+        document.createElement("canvas");
+
+    canvas.width = 512;
+    canvas.height = 128;
+
+    const ctx =
+        canvas.getContext("2d");
+
+    ctx.fillStyle = "#173f2c";
+
+    ctx.fillRect(
+        10,
+        10,
+        492,
+        108
+    );
+
+    ctx.fillStyle = "#f4efdf";
+
+    ctx.font =
+        text.length > 13
+        ? "bold 27px Arial"
+        : "bold 34px Arial";
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.fillText(
+        text,
+        256,
+        64
+    );
+
+    const texture =
+        new THREE.CanvasTexture(canvas);
+
+    texture.colorSpace =
+        THREE.SRGBColorSpace;
+
+    const material =
+        new THREE.MeshBasicMaterial({
+            map:texture,
+            transparent:true
+        });
+
+    return new THREE.Mesh(
+        new THREE.PlaneGeometry(
+            5,
+            1.25
+        ),
+        material
+    );
+
+}
+
+
+/* =========================================================
+   ENVIRONMENT
+========================================================= */
+
+function createEnvironment(){
+
+    for(let i=0;i<100;i++){
+
+        const x =
+            -95 + Math.random()*190;
+
+        const z =
+            -75 + Math.random()*150;
+
+        const lakeCheck =
+            ((x/43)*(x/43)) +
+            ((z/22)*(z/22));
+
+        if(lakeCheck < 1.5){
+            continue;
+        }
+
+        if(
+            Math.abs(x)<20 &&
+            Math.abs(z)<20
+        ){
+            continue;
+        }
+
+        createTree(
+            x,
+            z,
+            .8 + Math.random()*.7
+        );
+
+    }
+
+    createBench(-25,-27);
+    createBench(25,-27);
+    createBench(-25,27);
+    createBench(25,27);
+
+}
+
+
+/* =========================================================
+   TREE
+========================================================= */
+
+function createTree(x,z,scale){
+
+    const tree =
+        new THREE.Group();
+
+    tree.position.set(x,0,z);
+
+    tree.scale.setScalar(scale);
+
+    const trunk =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                .45,
+                .6,
+                3.5,
+                8
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0x634832
+            })
+        );
+
+    trunk.position.y = 1.75;
+    trunk.castShadow = true;
+
+    tree.add(trunk);
+
+    for(let i=0;i<3;i++){
+
+        const crown =
+            new THREE.Mesh(
+                new THREE.IcosahedronGeometry(
+                    2.5,
+                    1
+                ),
+                new THREE.MeshStandardMaterial({
+                    color:
+                        i===0
+                        ? 0x42683f
+                        : 0x527b48,
+                    roughness:1
+                })
+            );
+
+        crown.position.set(
+            (Math.random()-.5)*1.3,
+            4+i*1.3,
+            (Math.random()-.5)*1.3
+        );
+
+        crown.castShadow = true;
+
+        tree.add(crown);
+
+    }
+
+    scene.add(tree);
+
+}
+
+
+/* =========================================================
+   BENCH
+========================================================= */
+
+function createBench(x,z){
+
+    const group =
+        new THREE.Group();
+
+    group.position.set(x,0,z);
+
+    const wood =
+        new THREE.MeshStandardMaterial({
+            color:0x6c4a2f
+        });
+
+    const seat =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                3,
+                .25,
+                .8
+            ),
+            wood
+        );
+
+    seat.position.y = 1.1;
+
+    group.add(seat);
+
+    const back =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                3,
+                1.1,
+                .2
+            ),
+            wood
+        );
+
+    back.position.set(
+        0,
+        1.55,
+        -.3
+    );
+
+    group.add(back);
+
+    scene.add(group);
+
+}
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+function createPlayer(){
+
+    playerGroup =
+        new THREE.Group();
+
+    playerGroup.position.set(
+        0,
+        0,
+        -65
+    );
+
+    const body =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                .55,
+                .7,
+                1.5,
+                12
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0xd8d0a7,
+                roughness:.8
+            })
+        );
+
+    body.position.y = 1.2;
+
+    body.castShadow = true;
+
+    playerGroup.add(body);
+
+
+    const head =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .5,
+                16,
+                16
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0xc58c67,
+                roughness:.8
+            })
+        );
+
+    head.position.y = 2.4;
+
+    head.castShadow = true;
+
+    playerGroup.add(head);
+
+
+    const faceMaterial =
+        new THREE.MeshStandardMaterial({
+            color:0x241b17,
+            roughness:.7
+        });
+
+    const eyeLeft =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .075,
+                10,
+                10
+            ),
+            faceMaterial
+        );
+
+    eyeLeft.position.set(
+        -.17,
+        2.48,
+        .44
+    );
+
+    playerGroup.add(eyeLeft);
+
+    const eyeRight =
+        eyeLeft.clone();
+
+    eyeRight.position.x = .17;
+
+    playerGroup.add(eyeRight);
+
+
+    const nose =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .045,
+                8,
+                8
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0xb9785b,
+                roughness:.8
+            })
+        );
+
+    nose.position.set(
+        0,
+        2.34,
+        .48
+    );
+
+    playerGroup.add(nose);
+
+
+    const mouth =
+        new THREE.Mesh(
+            new THREE.TorusGeometry(
+                .12,
+                .025,
+                6,
+                16,
+                Math.PI
+            ),
+            faceMaterial
+        );
+
+    mouth.rotation.x =
+        Math.PI / 2;
+
+    mouth.rotation.z =
+        Math.PI;
+
+    mouth.position.set(
+        0,
+        2.22,
+        .47
+    );
+
+    playerGroup.add(mouth);
+
+
+    const marker =
+        new THREE.Mesh(
+            new THREE.ConeGeometry(
+                .25,
+                .6,
+                8
+            ),
+            new THREE.MeshBasicMaterial({
+                color:0xffe18b
+            })
+        );
+
+    marker.position.y = 3.3;
+
+    marker.rotation.x =
+        Math.PI;
+
+    playerGroup.add(marker);
+
+    scene.add(playerGroup);
+
+    player = playerGroup;
+
+}
+
+
+/* =========================================================
+   NPC
+========================================================= */
+
+function createNPCs(){
+
+    for(let i=0;i<18;i++){
+
+        const npc =
+            createNPC();
+
+        npc.position.set(
+            -80 + Math.random()*160,
+            0,
+            -60 + Math.random()*120
+        );
+
+        npc.userData.direction =
+            Math.random()*Math.PI*2;
+
+        npc.userData.speed =
+            .8 + Math.random()*.7;
+
+        scene.add(npc);
+
+        npcs.push(npc);
+
+    }
+
+}
+
+
+function createNPC(){
+
+    const group =
+        new THREE.Group();
+
+    const colors = [
+        0xd2a67b,
+        0x8eaf9a,
+        0xc7a7b9,
+        0xb0a47c,
+        0x7894a8
+    ];
+
+    const body =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                .4,
+                .5,
+                1.5,
+                10
+            ),
+            new THREE.MeshStandardMaterial({
+                color:
+                    colors[
+                        Math.floor(
+                            Math.random()*colors.length
+                        )
+                    ],
+                roughness:.9
+            })
+        );
+
+    body.position.y = .9;
+    body.castShadow = true;
+
+    group.add(body);
+
+    const head =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .38,
+                12,
+                12
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0xc58c67,
+                roughness:.9
+            })
+        );
+
+    head.position.y = 1.8;
+    head.castShadow = true;
+
+    group.add(head);
+
+    return group;
+
+}
+
+
+/* =========================================================
+   MOVIMIENTO
+========================================================= */
+
+function updatePlayer(delta){
+
+    if(routeMoving){
+
+        updateRoute(delta);
+
+        return;
+    }
+
+    let dx = 0;
+    let dz = 0;
+
+    if(keys["w"] || keys["arrowup"]){
+        dz -= 1;
+    }
+
+    if(keys["s"] || keys["arrowdown"]){
+        dz += 1;
+    }
+
+    if(keys["a"] || keys["arrowleft"]){
+        dx -= 1;
+    }
+
+    if(keys["d"] || keys["arrowright"]){
+        dx += 1;
+    }
+
+    if(dx===0 && dz===0){
+        return;
+    }
+
+    const length =
+        Math.sqrt(dx*dx + dz*dz);
+
+    dx /= length;
+    dz /= length;
+
+    const speed =
+        10 * delta;
+
+    movePlayer(
+        dx*speed,
+        dz*speed
+    );
+
+    player.rotation.y =
+        Math.atan2(dx,dz);
+
+    updateLocation();
+
+}
+
+
+function movePlayer(dx,dz){
+
+    const newX =
+        player.position.x + dx;
+
+    const newZ =
+        player.position.z + dz;
+
+    if(!isBlocked(newX,player.position.z)){
+        player.position.x = newX;
+    }
+
+    if(!isBlocked(player.position.x,newZ)){
+        player.position.z = newZ;
+    }
+
+}
+
+
+/* =========================================================
+   COLISIONES
+========================================================= */
+
+function isBlocked(x,z){
+
+    if(
+        x < -98 ||
+        x > 98 ||
+        z < -78 ||
+        z > 78
+    ){
+        return true;
+    }
+
+
+    /* LAGUNA */
+
+    const lake =
+        ((x/43)*(x/43)) +
+        ((z/22)*(z/22));
+
+    if(lake < .78){
+        return true;
+    }
+
+
+    /* EDIFICIOS Y PILETA */
+
+    for(const obstacle of obstacles){
+
+        if(
+            obstacle.type !== "building" &&
+            obstacle.type !== "pool"
+        ){
+            continue;
+        }
+
+        if(
+            Math.abs(x-obstacle.x)
+            <
+            obstacle.w/2 + 1.3
+
+            &&
+
+            Math.abs(z-obstacle.z)
+            <
+            obstacle.d/2 + 1.3
+        ){
+            return true;
+        }
+
+    }
+
+    return false;
+
+}
+
+
+/* =========================================================
+   NPC MOVEMENT
+========================================================= */
+
+function updateNPCs(delta){
+
+    npcs.forEach(function(npc){
+
+        const dir =
+            npc.userData.direction;
+
+        const speed =
+            npc.userData.speed;
+
+        const nx =
+            npc.position.x +
+            Math.cos(dir) *
+            speed *
+            delta;
+
+        const nz =
+            npc.position.z +
+            Math.sin(dir) *
+            speed *
+            delta;
+
+        if(!isBlocked(nx,nz)){
+
+            npc.position.x = nx;
+            npc.position.z = nz;
+
+        }else{
+
+            npc.userData.direction +=
+                Math.PI *
+                (.5 + Math.random());
+
+        }
+
+        npc.rotation.y = -dir;
+
+    });
+
+}
+
+
+/* =========================================================
+   BUSINESS LIST
+========================================================= */
+
+function createBusinessList(){
+
+    const container =
+        document.getElementById("business-list");
+
+    businessData.forEach(function(data){
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "business-item";
+
+        item.dataset.name =
+            data.name.toLowerCase();
+
+        item.dataset.id =
+            data.id;
+
+        item.innerHTML = `
+            <div class="business-name">
+                ${data.name}
+            </div>
+
+            <div class="business-category">
+                ${data.category}
+            </div>
+        `;
+
+        item.addEventListener(
+            "click",
+            function(){
+
+                selectBusiness(data);
+
+            }
+        );
+
+        container.appendChild(item);
+
+    });
+
+}
+
+
+/* =========================================================
+   SELECT BUSINESS
+========================================================= */
+
+function selectBusiness(data){
+
+    selectedBusiness = data;
+
+    selectedBuilding =
+        buildings.find(function(building){
+
+            return (
+                building.userData.business.id ===
+                data.id
+            );
+
+        });
+
+    highlightBuilding(selectedBuilding);
+
+    document.getElementById("info-category").textContent =
+        data.category;
+
+    document.getElementById("info-title").textContent =
+        data.name;
+
+    document.getElementById("info-description").textContent =
+        data.description;
+
+    document.getElementById("info").classList.add("open");
+
+    document.getElementById("route-button").onclick =
+        function(){
+
+            startRoute(data);
+
+        };
+
+
+    document
+        .querySelectorAll(".business-item")
+        .forEach(function(item){
+
+            item.classList.remove("active");
+
+        });
+
+
+    const active =
+        document.querySelector(
+            '.business-item[data-id="' +
+            data.id +
+            '"]'
+        );
+
+    if(active){
+        active.classList.add("active");
+    }
+
+    toast(
+        data.name + " seleccionado"
+    );
+
+}
+
+
+/* =========================================================
+   HIGHLIGHT
+========================================================= */
+
+function highlightBuilding(building){
+
+    buildings.forEach(function(b){
+
+        const mesh =
+            b.userData.clickMesh;
+
+        mesh.scale.set(1,1,1);
+
+    });
+
+    if(building){
+
+        const mesh =
+            building.userData.clickMesh;
+
+        mesh.scale.set(
+            1.06,
+            1.06,
+            1.06
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   INFO
+========================================================= */
+
+function closeInfo(){
+
+    document
+        .getElementById("info")
+        .classList.remove("open");
+
+    selectedBusiness = null;
+    selectedBuilding = null;
+
+    highlightBuilding(null);
+
+}
+
+
+/* =========================================================
+   ROUTE
+========================================================= */
+
+function startRoute(data){
+
+    cancelRoute();
+
+    const start =
+        new THREE.Vector3(
+            player.position.x,
+            .5,
+            player.position.z
+        );
+
+    const end =
+        new THREE.Vector3(
+            data.routeX,
+            .5,
+            data.routeZ
+        );
+
+    routePoints =
+        createRoute(start,end);
+
+    if(routePoints.length === 0){
+
+        toast(
+            "No se pudo encontrar una ruta."
+        );
+
+        return;
+    }
+
+    drawRoute(routePoints);
+
+    routeIndex = 0;
+
+    routeMoving = true;
+
+    toast(
+        "Ruta hacia " +
+        data.name
+    );
+
+}
+
+
+/* =========================================================
+   RUTA INTELIGENTE
+========================================================= */
+
+function createRoute(start,end){
+
+    /*
+        Primero intenta ruta directa.
+    */
+
+    if(isLineSafe(start,end)){
+
+        return interpolateRoute(
+            start,
+            end
+        );
+
+    }
+
+
+    /*
+        Si está bloqueada, genera varias
+        alternativas alrededor de la laguna.
+    */
+
+    const candidates = [];
+
+
+    /* CAMINO NORTE */
+
+    candidates.push([
+        start,
+        new THREE.Vector3(
+            start.x,
+            .5,
+            -37
+        ),
+        new THREE.Vector3(
+            end.x,
+            .5,
+            -37
+        ),
+        end
+    ]);
+
+
+    /* CAMINO SUR */
+
+    candidates.push([
+        start,
+        new THREE.Vector3(
+            start.x,
+            .5,
+            37
+        ),
+        new THREE.Vector3(
+            end.x,
+            .5,
+            37
+        ),
+        end
+    ]);
+
+
+    /* CAMINO ESTE */
+
+    candidates.push([
+        start,
+        new THREE.Vector3(
+            55,
+            .5,
+            start.z
+        ),
+        new THREE.Vector3(
+            55,
+            .5,
+            end.z
+        ),
+        end
+    ]);
+
+
+    /* CAMINO OESTE */
+
+    candidates.push([
+        start,
+        new THREE.Vector3(
+            -55,
+            .5,
+            start.z
+        ),
+        new THREE.Vector3(
+            -55,
+            .5,
+            end.z
+        ),
+        end
+    ]);
+
+
+    let bestRoute = null;
+    let bestDistance = Infinity;
+
+
+    candidates.forEach(function(candidate){
+
+        let valid = true;
+        let total = 0;
+
+        for(let i=1;i<candidate.length;i++){
+
+            const a = candidate[i-1];
+            const b = candidate[i];
+
+            if(!isLineSafe(a,b)){
+
+                valid = false;
+                break;
+
+            }
+
+            total +=
+                a.distanceTo(b);
+
+        }
+
+
+        if(valid && total < bestDistance){
+
+            bestDistance = total;
+            bestRoute = candidate;
+
+        }
+
+    });
+
+
+    if(!bestRoute){
+
+        return [];
+
+    }
+
+
+    return smoothRoute(bestRoute);
+
+}
+
+
+/* =========================================================
+   VERIFICAR SEGMENTO
+========================================================= */
+
+function isLineSafe(start,end){
+
+    const distance =
+        start.distanceTo(end);
+
+    const steps =
+        Math.max(
+            2,
+            Math.ceil(distance / 1.5)
+        );
+
+    for(let i=0;i<=steps;i++){
+
+        const t =
+            i / steps;
+
+        const x =
+            start.x +
+            (end.x-start.x)*t;
+
+        const z =
+            start.z +
+            (end.z-start.z)*t;
+
+
+        /*
+            No entrar en la laguna.
+        */
+
+        const lake =
+            ((x/43)*(x/43)) +
+            ((z/22)*(z/22));
+
+        if(lake < .88){
+
+            return false;
+
+        }
+
+
+        /*
+            No atravesar edificios
+            ni pileta.
+        */
+
+        if(isBuildingBlocked(x,z)){
+
+            return false;
+
+        }
+
+    }
+
+    return true;
+
+}
+
+
+/* =========================================================
+   INTERPOLAR RUTA
+========================================================= */
+
+function interpolateRoute(start,end){
+
+    const points = [];
+
+    const distance =
+        start.distanceTo(end);
+
+    const steps =
+        Math.max(
+            2,
+            Math.ceil(distance / 1.5)
+        );
+
+    for(let i=0;i<=steps;i++){
+
+        const t =
+            i/steps;
+
+        points.push(
+            new THREE.Vector3(
+                start.x +
+                (end.x-start.x)*t,
+
+                .5,
+
+                start.z +
+                (end.z-start.z)*t
+            )
+        );
+
+    }
+
+    return points;
+
+}
+
+
+/* =========================================================
+   SUAVIZAR RUTA
+========================================================= */
+
+function smoothRoute(waypoints){
+
+    const points = [];
+
+    for(let i=0;i<waypoints.length-1;i++){
+
+        const segment =
+            interpolateRoute(
+                waypoints[i],
+                waypoints[i+1]
+            );
+
+        if(i > 0){
+            segment.shift();
+        }
+
+        points.push(...segment);
+
+    }
+
+    return points;
+
+}
+
+
+/* =========================================================
+   BUILDING BLOCK
+========================================================= */
+
+function isBuildingBlocked(x,z){
+
+    for(const obstacle of obstacles){
+
+        if(
+            obstacle.type !== "building" &&
+            obstacle.type !== "pool"
+        ){
+            continue;
+        }
+
+        if(
+            Math.abs(x-obstacle.x)
+            <
+            obstacle.w/2 + .5
+
+            &&
+
+            Math.abs(z-obstacle.z)
+            <
+            obstacle.d/2 + .5
+        ){
+
+            return true;
+
+        }
+
+    }
+
+    return false;
+
+}
+
+
+/* =========================================================
+   DRAW ROUTE
+========================================================= */
+
+function drawRoute(points){
+
+    if(routeLine){
+
+        scene.remove(routeLine);
+
+        routeLine.geometry.dispose();
+        routeLine.material.dispose();
+
+    }
+
+    const geometry =
+        new THREE.BufferGeometry()
+            .setFromPoints(points);
+
+    const material =
+        new THREE.LineDashedMaterial({
+
+            color:0xffe08a,
+
+            dashSize:1.5,
+
+            gapSize:.7
+
+        });
+
+    routeLine =
+        new THREE.Line(
+            geometry,
+            material
+        );
+
+    routeLine.computeLineDistances();
+
+    scene.add(routeLine);
+
+}
+
+
+/* =========================================================
+   ROUTE MOVEMENT
+========================================================= */
+
+function updateRoute(delta){
+
+    if(routeIndex >= routePoints.length){
+
+        routeMoving = false;
+
+        toast(
+            "Llegaste a " +
+            (
+                selectedBusiness
+                ? selectedBusiness.name
+                : "destino"
+            )
+        );
+
+        return;
+
+    }
+
+    const target =
+        routePoints[routeIndex];
+
+    const current =
+        player.position;
+
+    const direction =
+        new THREE.Vector3()
+            .subVectors(
+                target,
+                current
+            );
+
+    const distance =
+        direction.length();
+
+    if(distance < .7){
+
+        routeIndex++;
+
+        return;
+
+    }
+
+    direction.normalize();
+
+    const speed =
+        9 * delta;
+
+    const nextX =
+        current.x +
+        direction.x*speed;
+
+    const nextZ =
+        current.z +
+        direction.z*speed;
+
+    if(!isBlocked(nextX,nextZ)){
+
+        player.position.x =
+            nextX;
+
+        player.position.z =
+            nextZ;
+
+    }else{
+
+        routeMoving = false;
+
+        toast("Ruta bloqueada");
+
+        return;
+
+    }
+
+    player.rotation.y =
+        Math.atan2(
+            direction.x,
+            direction.z
+        );
+
+    updateLocation();
+
+}
+
+
+/* =========================================================
+   CANCEL ROUTE
+========================================================= */
+
+function cancelRoute(){
+
+    routeMoving = false;
+
+    routePoints = [];
+
+    routeIndex = 0;
+
+    if(routeLine){
+
+        scene.remove(routeLine);
+
+        routeLine.geometry.dispose();
+        routeLine.material.dispose();
+
+        routeLine = null;
+
+    }
+
+}
+
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+function updateCamera(){
+
+    if(!player){
+        return;
+    }
+
+    if(topView){
+
+        targetCameraPosition.set(
+            player.position.x,
+            90,
+            player.position.z + .01
+        );
+
+        cameraTarget.set(
+            player.position.x,
+            0,
+            player.position.z
+        );
+
+    }else{
+
+        const x =
+            player.position.x +
+            Math.sin(cameraAngle) *
+            cameraDistance;
+
+        const z =
+            player.position.z +
+            Math.cos(cameraAngle) *
+            cameraDistance;
+
+        targetCameraPosition.set(
+            x,
+            cameraHeight,
+            z
+        );
+
+        cameraTarget.set(
+            player.position.x,
+            1.5,
+            player.position.z
+        );
+
+    }
+
+    camera.position.lerp(
+        targetCameraPosition,
+        .08
+    );
+
+    camera.lookAt(cameraTarget);
+
+}
+
+
+function resetCamera(){
+
+    topView = false;
+
+    cameraAngle = .7;
+    cameraDistance = 22;
+    cameraHeight = 10;
+
+    toast("Cámara reiniciada");
+
+}
+
+
+function centerPlayer(){
+
+    cameraTarget.copy(
+        player.position
+    );
+
+    toast("Ubicación centrada");
+
+}
+
+
+function toggleTopView(){
+
+    topView = !topView;
+
+    toast(
+        topView
+        ? "Vista aérea"
+        : "Vista normal"
+    );
+
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+function setupEvents(){
+
+    window.addEventListener(
+        "keydown",
+        function(event){
+
+            const key =
+                event.key.toLowerCase();
+
+            keys[key] = true;
+
+            if([
+                "w",
+                "a",
+                "s",
+                "d",
+                "arrowup",
+                "arrowdown",
+                "arrowleft",
+                "arrowright"
+            ].includes(key)){
+
+                event.preventDefault();
+
+            }
+
+            if(key === "v"){
+                toggleTopView();
+            }
+
+            if(key === "r"){
+                resetCamera();
+            }
+
+            if(key === "escape"){
+
+                closeInfo();
+                cancelRoute();
+
+            }
+
+        }
+    );
+
+
+    window.addEventListener(
+        "keyup",
+        function(event){
+
+            keys[
+                event.key.toLowerCase()
+            ] = false;
+
+        }
+    );
+
+
+    renderer.domElement.addEventListener(
+        "pointerdown",
+        onPointerDown
+    );
+
+    renderer.domElement.addEventListener(
+        "pointermove",
+        onPointerMove
+    );
+
+    renderer.domElement.addEventListener(
+        "pointerup",
+        onPointerUp
+    );
+
+    renderer.domElement.addEventListener(
+        "pointercancel",
+        onPointerUp
+    );
+
+    renderer.domElement.addEventListener(
+        "wheel",
+        onWheel,
+        {
+            passive:true
+        }
+    );
+
+
+    document
+        .getElementById("search")
+        .addEventListener(
+            "input",
+            filterBusinesses
+        );
+
+
+    document
+        .querySelectorAll(".mobile-btn")
+        .forEach(function(button){
+
+            const key =
+                button.dataset.key;
+
+            button.addEventListener(
+                "pointerdown",
+                function(event){
+
+                    event.preventDefault();
+
+                    keys[key] = true;
+
+                }
+            );
+
+            button.addEventListener(
+                "pointerup",
+                function(event){
+
+                    event.preventDefault();
+
+                    keys[key] = false;
+
+                }
+            );
+
+            button.addEventListener(
+                "pointercancel",
+                function(){
+
+                    keys[key] = false;
+
+                }
+            );
+
+            button.addEventListener(
+                "pointerleave",
+                function(){
+
+                    keys[key] = false;
+
+                }
+            );
+
+        });
+
+}
+
+
+/* =========================================================
+   POINTER
+========================================================= */
+
+function onPointerDown(event){
+
+    mouseDown = true;
+
+    mouseMoved = false;
+
+    lastMouseX =
+        event.clientX;
+
+    lastMouseY =
+        event.clientY;
+
+}
+
+
+function onPointerMove(event){
+
+    const dx =
+        event.clientX -
+        lastMouseX;
+
+    const dy =
+        event.clientY -
+        lastMouseY;
+
+    if(mouseDown){
+
+        if(
+            Math.abs(dx)>3 ||
+            Math.abs(dy)>3
+        ){
+
+            mouseMoved = true;
+
+        }
+
+        if(!topView){
+
+            cameraAngle -=
+                dx*.005;
+
+            cameraHeight +=
+                dy*.04;
+
+            cameraHeight =
+                THREE.MathUtils.clamp(
+                    cameraHeight,
+                    5,
+                    25
+                );
+
+        }
+
+    }
+
+    lastMouseX =
+        event.clientX;
+
+    lastMouseY =
+        event.clientY;
+
+    updateHover(event);
+
+}
+
+
+function onPointerUp(event){
+
+    if(
+        mouseDown &&
+        !mouseMoved
+    ){
+
+        clickObject(event);
+
+    }
+
+    mouseDown = false;
+
+}
+
+
+function onWheel(event){
+
+    cameraDistance +=
+        event.deltaY*.015;
+
+    cameraDistance =
+        THREE.MathUtils.clamp(
+            cameraDistance,
+            8,
+            45
+        );
+
+}
+
+
+/* =========================================================
+   RAYCAST
+========================================================= */
+
+function updateMouse(event){
+
+    const rect =
+        renderer.domElement
+            .getBoundingClientRect();
+
+    mouse.x =
+        (
+            (event.clientX-rect.left) /
+            rect.width
+        )*2-1;
+
+    mouse.y =
+        -(
+            (event.clientY-rect.top) /
+            rect.height
+        )*2+1;
+
+}
+
+
+function updateHover(event){
+
+    updateMouse(event);
+
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
+
+    const hits =
+        raycaster.intersectObjects(
+            buildingMeshes
+        );
+
+    if(hits.length){
+
+        const building =
+            hits[0]
+                .object
+                .userData
+                .building;
+
+        if(building !== hoveredBuilding){
+
+            hoveredBuilding =
+                building;
+
+            renderer.domElement.style.cursor =
+                "pointer";
+
+        }
+
+    }else{
+
+        hoveredBuilding = null;
+
+        renderer.domElement.style.cursor =
+            "default";
+
+    }
+
+}
+
+
+function clickObject(event){
+
+    updateMouse(event);
+
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
+
+    const hits =
+        raycaster.intersectObjects(
+            buildingMeshes
+        );
+
+    if(!hits.length){
+        return;
+    }
+
+    const building =
+        hits[0]
+            .object
+            .userData
+            .building;
+
+    if(building){
+
+        selectBusiness(
+            building.userData.business
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+function filterBusinesses(){
+
+    const value =
+        document
+            .getElementById("search")
+            .value
+            .toLowerCase()
+            .trim();
+
+    document
+        .querySelectorAll(".business-item")
+        .forEach(function(item){
+
+            const name =
+                item.dataset.name;
+
+            item.style.display =
+                name.includes(value)
+                ? "block"
+                : "none";
+
+        });
+
+}
+
+
+/* =========================================================
+   LOCATION
+========================================================= */
+
+function updateLocation(){
+
+    let closest = null;
+
+    let distance = Infinity;
+
+    businessData.forEach(function(data){
+
+        const dx =
+            player.position.x -
+            data.x;
+
+        const dz =
+            player.position.z -
+            data.z;
+
+        const d =
+            Math.sqrt(
+                dx*dx + dz*dz
+            );
+
+        if(d < distance){
+
+            distance = d;
+            closest = data;
+
+        }
+
+    });
+
+    document.getElementById("location").textContent =
+        distance < 15
+        ? closest.name
+        : "Parque";
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function toast(message){
+
+    const element =
+        document.getElementById("toast");
+
+    if(!element){
+        return;
+    }
+
+    element.textContent =
+        message;
+
+    element.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer =
+        setTimeout(function(){
+
+            element.classList.remove("show");
+
+        },1800);
+
+}
+
+
+/* =========================================================
+   MINIMAP
+========================================================= */
+
+function updateMinimap(){
+
+    if(!player){
+        return;
+    }
+
+    const canvas =
+        document.getElementById("minimap");
+
+    if(!canvas){
+        return;
+    }
+
+    const ctx =
+        canvas.getContext("2d");
+
+    const w = canvas.width;
+    const h = canvas.height;
+
+    ctx.clearRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+    ctx.fillStyle =
+        "#355e3d";
+
+    ctx.fillRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+
+    function mapX(x){
+
+        return ((x+105)/210)*w;
+
+    }
+
+
+    function mapZ(z){
+
+        return ((z+85)/170)*h;
+
+    }
+
+
+    /* LAGUNA */
+
+    ctx.fillStyle =
+        "#4e9296";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        mapX(0),
+        mapZ(0),
+        43/210*w,
+        22/170*h,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* PILETA */
+
+    ctx.fillStyle =
+        "#48a8b5";
+
+    ctx.fillRect(
+        mapX(82)-8,
+        mapZ(-28)-5,
+        16,
+        10
+    );
+
+
+    /* CAMINOS */
+
+    ctx.strokeStyle =
+        "rgba(230,220,190,.45)";
+
+    ctx.lineWidth = 4;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        mapX(-100),
+        mapZ(0)
+    );
+
+    ctx.lineTo(
+        mapX(100),
+        mapZ(0)
+    );
+
+    ctx.moveTo(
+        mapX(0),
+        mapZ(-80)
+    );
+
+    ctx.lineTo(
+        mapX(0),
+        mapZ(80)
+    );
+
+    ctx.stroke();
+
+
+    /* EDIFICIOS */
+
+    businessData.forEach(function(data){
+
+        ctx.fillStyle =
+            data === selectedBusiness
+            ? "#ffe18b"
+            : "#d8d0a7";
+
+        ctx.fillRect(
+            mapX(data.x)-3,
+            mapZ(data.z)-3,
+            6,
+            6
+        );
+
+    });
+
+
+    /* RUTA */
+
+    if(routePoints.length){
+
+        ctx.strokeStyle =
+            "#ffe18b";
+
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+
+        routePoints.forEach(
+            function(point,index){
+
+                const x =
+                    mapX(point.x);
+
+                const z =
+                    mapZ(point.z);
+
+                if(index===0){
+
+                    ctx.moveTo(x,z);
+
+                }else{
+
+                    ctx.lineTo(x,z);
+
+                }
+
+            }
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    /* PLAYER */
+
+    ctx.fillStyle =
+        "#ffffff";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        mapX(player.position.x),
+        mapZ(player.position.z),
+        5,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+}
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+function animate(){
+
+    requestAnimationFrame(animate);
+
+    const delta =
+        Math.min(
+            clock.getDelta(),
+            .05
+        );
+
+    waterTime += delta;
+
+
+    /* AGUA LAGUNA */
+
+    if(water){
+
+        water.position.y =
+            .13 +
+            Math.sin(
+                waterTime*1.4
+            )*.025;
+
+        water.rotation.z =
+            Math.sin(
+                waterTime*.15
+            )*.008;
+
+    }
+
+
+    /* AGUA PILETA */
+
+    if(poolWater){
+
+        poolWater.position.y =
+            .4 +
+            Math.sin(
+                waterTime*1.7
+            )*.012;
+
+    }
+
+
+    updatePlayer(delta);
+
+    updateNPCs(delta);
+
+    updateCamera();
+
+
+    if(routeLine){
+
+        routeLine.material.dashOffset -=
+            delta*.8;
+
+    }
+
+
+    updateMinimap();
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+function onResize(){
+
+    if(!camera || !renderer){
+        return;
+    }
+
+    camera.aspect =
+        window.innerWidth /
+        window.innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+}
+
+
+/* =========================================================
+   MOBILE UX
+========================================================= */
+
+(function(){
+
+    const panel =
+        document.getElementById(
+            "search-panel"
+        );
+
+    const toggle =
+        document.getElementById(
+            "mobile-search-toggle"
+        );
+
+    const backdrop =
+        document.getElementById(
+            "search-backdrop"
+        );
+
+
+    if(!panel || !toggle || !backdrop){
+        return;
+    }
+
+
+    function closeMobileSearch(){
+
+        panel.classList.remove(
+            "mobile-open"
+        );
+
+        backdrop.classList.remove(
+            "mobile-open"
+        );
+
+        toggle.textContent = "⌕";
+
+    }
+
+
+    toggle.addEventListener(
+        "click",
+        function(){
+
+            const open =
+                !panel.classList.contains(
+                    "mobile-open"
+                );
+
+            panel.classList.toggle(
+                "mobile-open",
+                open
+            );
+
+            backdrop.classList.toggle(
+                "mobile-open",
+                open
+            );
+
+            toggle.textContent =
+                open ? "×" : "⌕";
+
+        }
+    );
+
+
+    backdrop.addEventListener(
+        "click",
+        closeMobileSearch
+    );
+
+
+    document
+        .querySelectorAll(".business-item")
+        .forEach(function(item){
+
+            item.addEventListener(
+                "click",
+                function(){
+
+                    if(window.innerWidth <= 700){
+
+                        setTimeout(
+                            closeMobileSearch,
+                            180
+                        );
+
+                    }
+
+                }
+            );
+
+        });
+
+
+    const center =
+        document.getElementById(
+            "mobile-center"
+        );
+
+    if(center){
+
+        center.addEventListener(
+            "click",
+            centerPlayer
+        );
+
+    }
+
+
+    const view =
+        document.getElementById(
+            "mobile-view"
+        );
+
+    if(view){
+
+        view.addEventListener(
+            "click",
+            toggleTopView
+        );
+
+    }
+
+
+    const zoomIn =
+        document.getElementById(
+            "mobile-zoom-in"
+        );
+
+    if(zoomIn){
+
+        zoomIn.addEventListener(
+            "click",
+            function(){
+
+                cameraDistance =
+                    Math.max(
+                        8,
+                        cameraDistance-4
+                    );
+
+                toast(
+                    "Vista acercada"
+                );
+
+            }
+        );
+
+    }
+
+
+    const zoomOut =
+        document.getElementById(
+            "mobile-zoom-out"
+        );
+
+    if(zoomOut){
+
+        zoomOut.addEventListener(
+            "click",
+            function(){
+
+                cameraDistance =
+                    Math.min(
+                        45,
+                        cameraDistance+4
+                    );
+
+                toast(
+                    "Vista alejada"
+                );
+
+            }
+        );
+
+    }
+
+
+    window.addEventListener(
+        "blur",
+        function(){
+
+            Object.keys(keys)
+                .forEach(function(key){
+
+                    keys[key] = false;
+
+                });
+
+        }
+    );
+
+})();
+
+</script>
+
+
+</body>
+</html>
